@@ -1,0 +1,276 @@
+/* KenEasy Word Converter — declarative product rules and defaults. */
+(function (global) {
+  "use strict";
+
+  var config = {
+    version: "1.0.0",
+    appName: "KenEasy Word Converter",
+    storageKeys: {
+      language: "keneasy-word-lang",
+      appearance: "keneasy-word-appearance",
+      settings: "keneasy-word-settings-v1",
+    },
+    limits: {
+      maxFiles: 100,
+      maxFileBytes: 50 * 1024 * 1024,
+      maxFilenameLength: 80,
+      maxPreviewChars: 10000,
+    },
+    input: {
+      accept: [
+        "odt",
+        "fodt",
+        "rtf",
+        "html",
+        "htm",
+        "xhtml",
+        "md",
+        "markdown",
+        "txt",
+        "docx",
+        "csv",
+        "tsv",
+        "log",
+        "json",
+        "xml",
+        "opml",
+      ],
+      rules: [
+        {
+          kind: "odt",
+          extensions: ["odt"],
+          mimeTypes: [
+            "application/vnd.oasis.opendocument.text",
+            "application/x-vnd.oasis.opendocument.text",
+          ],
+        },
+        {
+          kind: "fodt",
+          extensions: ["fodt"],
+          mimeTypes: [
+            "application/vnd.oasis.opendocument.text-flat-xml",
+            "text/xml",
+            "application/xml",
+          ],
+        },
+        {
+          kind: "rtf",
+          extensions: ["rtf"],
+          mimeTypes: ["application/rtf", "text/rtf"],
+        },
+        {
+          kind: "html",
+          extensions: ["html", "htm", "xhtml"],
+          mimeTypes: ["text/html", "application/xhtml+xml"],
+        },
+        {
+          kind: "md",
+          extensions: ["md", "markdown"],
+          mimeTypes: ["text/markdown", "text/x-markdown"],
+        },
+        {
+          kind: "docx",
+          extensions: ["docx"],
+          mimeTypes: [
+            "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+          ],
+        },
+        {
+          kind: "text",
+          extensions: ["txt", "log", "json", "xml", "opml", "csv", "tsv"],
+          mimePrefixes: ["text/"],
+        },
+        {
+          kind: "unsupported-doc",
+          extensions: ["doc", "wps"],
+          mimeTypes: ["application/msword", "application/kswps"],
+        },
+      ],
+    },
+    kinds: {
+      odt: { label: "ODT", convertible: true, highlight: "pink" },
+      fodt: { label: "FODT", convertible: true, highlight: "pink" },
+      rtf: { label: "RTF", convertible: true, highlight: "blue" },
+      html: { label: "HTML", convertible: true, highlight: "emerald" },
+      md: { label: "MD", convertible: true, highlight: "blue" },
+      docx: { label: "DOCX", convertible: true, highlight: "blue" },
+      text: { label: "TXT", convertible: true, highlight: "muted" },
+      "unsupported-doc": {
+        label: "DOC",
+        convertible: false,
+        errorKey: "unsupportedDoc",
+      },
+      unknown: { label: "?", convertible: false, errorKey: "unsupportedFormat" },
+    },
+    outputFormats: [
+      {
+        value: "docx",
+        labelKey: "formatDocx",
+        ext: "docx",
+        mime: "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+        badge: "Word (.docx)",
+      },
+      {
+        value: "txt",
+        labelKey: "formatTxt",
+        ext: "txt",
+        mime: "text/plain; charset=utf-8",
+        badge: "纯文本 (.txt)",
+      },
+      {
+        value: "html",
+        labelKey: "formatHtml",
+        ext: "html",
+        mime: "text/html; charset=utf-8",
+        badge: "网页 (.html)",
+      },
+      {
+        value: "md",
+        labelKey: "formatMd",
+        ext: "md",
+        mime: "text/markdown; charset=utf-8",
+        badge: "Markdown (.md)",
+      },
+    ],
+    pageSizes: [
+      { value: "a4", label: "A4 (210 × 297 mm)", widthDxa: 11906, heightDxa: 16838 },
+      { value: "letter", label: "Letter (8.5 × 11 in)", widthDxa: 12240, heightDxa: 15840 },
+      { value: "a5", label: "A5 (148 × 210 mm)", widthDxa: 8390, heightDxa: 11906 },
+      { value: "b5", label: "B5 (176 × 250 mm)", widthDxa: 9978, heightDxa: 14173 },
+    ],
+    margins: [
+      {
+        value: "normal",
+        labelKey: "marginNormal",
+        descKey: "marginNormalDesc",
+        top: 1440,
+        bottom: 1440,
+        left: 1440,
+        right: 1440,
+      },
+      {
+        value: "narrow",
+        labelKey: "marginNarrow",
+        descKey: "marginNarrowDesc",
+        top: 720,
+        bottom: 720,
+        left: 720,
+        right: 720,
+      },
+      {
+        value: "wide",
+        labelKey: "marginWide",
+        descKey: "marginWideDesc",
+        top: 1440,
+        bottom: 1440,
+        left: 2880,
+        right: 2880,
+      },
+    ],
+    typographies: [
+      {
+        value: "modern",
+        labelKey: "fontModern",
+        latin: "Calibri",
+        cjk: "Microsoft YaHei",
+        size: 24,
+        lineSpacing: 276,
+      },
+      {
+        value: "classic",
+        labelKey: "fontClassic",
+        latin: "Times New Roman",
+        cjk: "SimSun",
+        size: 24,
+        lineSpacing: 280,
+      },
+      {
+        value: "sans",
+        labelKey: "fontSans",
+        latin: "Arial",
+        cjk: "SimHei",
+        size: 22,
+        lineSpacing: 260,
+      },
+    ],
+    defaults: {
+      targetFormat: "docx",
+      delivery: "separate", // "separate" or "merge"
+      zipBundle: true,
+      pageSize: "a4",
+      margin: "normal",
+      typography: "modern",
+      firstLineIndent: false,
+      filename: "converted",
+    },
+    presets: [
+      {
+        id: "standard",
+        nameKey: "presetStandard",
+        descKey: "presetStandardDesc",
+        values: {
+          targetFormat: "docx",
+          delivery: "separate",
+          pageSize: "a4",
+          margin: "normal",
+          typography: "modern",
+          firstLineIndent: false,
+        },
+      },
+      {
+        id: "academic",
+        nameKey: "presetAcademic",
+        descKey: "presetAcademicDesc",
+        values: {
+          targetFormat: "docx",
+          delivery: "separate",
+          pageSize: "a4",
+          margin: "normal",
+          typography: "classic",
+          firstLineIndent: true,
+        },
+      },
+      {
+        id: "compact",
+        nameKey: "presetCompact",
+        descKey: "presetCompactDesc",
+        values: {
+          targetFormat: "docx",
+          delivery: "separate",
+          pageSize: "a4",
+          margin: "narrow",
+          typography: "sans",
+          firstLineIndent: false,
+        },
+      },
+      {
+        id: "mergeDocx",
+        nameKey: "presetMerge",
+        descKey: "presetMergeDesc",
+        values: {
+          targetFormat: "docx",
+          delivery: "merge",
+          pageSize: "a4",
+          margin: "normal",
+          typography: "modern",
+          firstLineIndent: false,
+        },
+      },
+      {
+        id: "plaintext",
+        nameKey: "presetPlainText",
+        descKey: "presetPlainTextDesc",
+        values: {
+          targetFormat: "txt",
+          delivery: "separate",
+          pageSize: "a4",
+          margin: "normal",
+          typography: "modern",
+          firstLineIndent: false,
+        },
+      },
+    ],
+  };
+
+  global.KenEasyWordConfig = Object.freeze(config);
+})(typeof window !== "undefined" ? window : globalThis);

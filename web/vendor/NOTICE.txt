@@ -1,0 +1,18 @@
+KenEasy Word Converter — vendored third-party libraries
+====================================================
+
+These files are bundled locally so the app runs fully offline (no CDN at runtime).
+
+| File            | Package     | Version | License      | Source |
+| --------------- | ----------- | ------- | ------------ | ------ |
+| Sortable.min.js | sortablejs  | 1.15.6  | MIT          | https://github.com/SortableJS/Sortable |
+| jszip.min.js    | jszip       | 3.10.1  | MIT or GPLv3 | https://github.com/Stuk/jszip |
+
+Notes
+-----
+- SortableJS is MIT licensed.
+- JSZip is dual-licensed under the MIT license OR GPLv3. This project uses it
+  under the MIT license.
+- All document parsing (ODT, FODT, RTF, HTML, Markdown, Plain Text) and
+  Office Open XML (DOCX) generation are implemented natively in pure JavaScript
+  with zero additional runtime dependencies.

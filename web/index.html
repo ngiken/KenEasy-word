@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>KenEasy Word Converter — 本地 ODT 与万能文档转 Word / TXT</title>
+  <meta name="description" content="拖入 ODT、FODT、RTF、HTML、Markdown 或文本文件，在浏览器本地高保真转换为 Microsoft Word (.docx) 或 TXT。无需安装、无需上传、零隐私泄露。">
+  <meta name="theme-color" content="#f5f5f7">
+  <meta name="referrer" content="no-referrer">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' blob: data:; connect-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'">
+  <link rel="stylesheet" href="styles.css?v=1.0.0">
+</head>
+<body>
+  <a class="skip-link" href="#main" data-i18n="skipToMain">跳到主要内容</a>
+
+  <div class="wallpaper" aria-hidden="true">
+    <span class="glow glow-one"></span>
+    <span class="glow glow-two"></span>
+    <span class="glow glow-three"></span>
+  </div>
+
+  <div class="app">
+    <header class="header">
+      <div class="brand" aria-label="KenEasy Word Converter">
+        <div class="logo" aria-hidden="true">
+          <svg viewBox="0 0 32 32">
+            <defs>
+              <linearGradient id="brandGradient" x1="3" y1="3" x2="29" y2="29" gradientUnits="userSpaceOnUse">
+                <stop stop-color="#ff6b9d"></stop>
+                <stop offset=".52" stop-color="#8b7cff"></stop>
+                <stop offset="1" stop-color="#42bff5"></stop>
+              </linearGradient>
+            </defs>
+            <rect x="1" y="1" width="30" height="30" rx="9" fill="url(#brandGradient)"></rect>
+            <path d="M8 8h10l6 6v10H8z" fill="none" stroke="white" stroke-width="1.8" stroke-linejoin="round"></path>
+            <path d="M18 8v6h6M11 16h10M11 20h7" fill="none" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"></path>
+          </svg>
+        </div>
+        <div class="brand-copy">
+          <strong>KenEasy</strong>
+          <span>Word Converter</span>
+        </div>
+        <span class="version-pill">v1.0.0</span>
+      </div>
+
+      <nav class="header-actions" data-i18n-aria-label="utilityAria" aria-label="工具导航">
+        <a class="github-link" href="https://github.com/ngiken/KenEasy-word.git" target="_blank" rel="noopener noreferrer" data-i18n-aria-label="githubAria" aria-label="在 GitHub 打开本项目，欢迎点 Star">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M12 2.8a9.2 9.2 0 0 0-2.9 17.9c.5.1.6-.2.6-.5v-1.8c-2.8.6-3.4-1.2-3.4-1.2-.5-1.2-1.1-1.5-1.1-1.5-.9-.6.1-.6.1-.6 1 0 1.6 1.1 1.6 1.1.9 1.6 2.4 1.1 3 .8.1-.7.4-1.1.7-1.4-2.2-.3-4.6-1.1-4.6-4.9 0-1.1.4-2 1-2.7-.1-.3-.4-1.3.1-2.7 0 0 .8-.3 2.8 1a9.4 9.4 0 0 1 5 0c1.9-1.3 2.8-1 2.8-1 .5 1.4.2 2.4.1 2.7.6.7 1 1.6 1 2.7 0 3.8-2.3 4.6-4.6 4.9.4.3.7.9.7 1.8v2.7c0 .4.2.7.7.5A9.2 9.2 0 0 0 12 2.8Z"></path>
+          </svg>
+          <span data-i18n="githubBtn">GitHub</span>
+        </a>
+        <button type="button" id="themeToggle" class="icon-control" aria-label="切换到深色外观">
+          <svg class="theme-icon theme-icon-sun" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3.5"></circle><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"></path></svg>
+          <svg class="theme-icon theme-icon-moon" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 15.2A8.6 8.6 0 0 1 8.8 4 8.8 8.8 0 1 0 20 15.2Z"></path></svg>
+        </button>
+        <div class="lang-switch" role="group" aria-label="Language">
+          <button type="button" class="lang-btn" data-lang="zh" id="langZh" aria-pressed="true">中</button>
+          <button type="button" class="lang-btn" data-lang="en" id="langEn" aria-pressed="false">EN</button>
+        </div>
+      </nav>
+    </header>
+
+    <main class="main" id="main">
+      <section class="hero">
+        <div class="hero-copy">
+          <p class="hero-kicker" data-i18n="eyebrow">A CALMER WORD WORKFLOW</p>
+          <h1 data-i18n="heroTitle">从各种复杂文档，到一份整洁 Word。</h1>
+          <p class="tagline" data-i18n="tagline">拖入、排序、自定义版式，一键转换。所有解析与排版都在你的设备上安静进行。</p>
+          <div class="hero-badges" data-i18n-aria-label="featuresAria" aria-label="产品特点">
+            <span class="hero-badge"><i class="hero-badge-dot pink"></i><span data-i18n="badgeNoInstall">无需安装</span></span>
+            <span class="hero-badge"><i class="hero-badge-dot blue"></i><span data-i18n="badgeLocal">本地处理</span></span>
+            <span class="hero-badge"><i class="hero-badge-dot green"></i><span data-i18n="badgeFidelity">高保真 ODT</span></span>
+            <span class="hero-badge"><i class="hero-badge-dot blue"></i><span data-i18n="badgeMixed">多格式支持</span></span>
+          </div>
+        </div>
+        <div class="doc-stack" aria-hidden="true">
+          <span class="doc-paper doc-paper-back"><b>ODT</b><i></i><i></i><i></i></span>
+          <span class="doc-paper doc-paper-mid"><b>RTF</b><i></i><i></i><i></i></span>
+          <span class="doc-paper doc-paper-front"><b>DOCX</b><i></i><i></i><i></i><i></i></span>
+          <span class="doc-merge-arrow">→</span>
+        </div>
+      </section>
+
+      <ol class="workflow-steps" id="workflowSteps" data-i18n-aria-label="workflowAria" aria-label="转换步骤">
+        <li data-workflow-step="1" aria-current="step"><span>1</span><strong data-i18n="workflowImport">导入文件</strong></li>
+        <li data-workflow-step="2"><span>2</span><strong data-i18n="workflowTune">设置版式</strong></li>
+        <li data-workflow-step="3"><span>3</span><strong data-i18n="workflowExport">生成 Word</strong></li>
+      </ol>
+
+      <section id="dropzone" class="dropzone" tabindex="0" role="button" data-i18n-aria-label="dropzoneAria" aria-label="拖入或点击选择要转换的文件">
+        <div class="dropzone-visual" aria-hidden="true">
+          <div class="drop-icon-box">
+            <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="12" y1="18" x2="12" y2="12"></line><line x1="9" y1="15" x2="15" y2="15"></line></svg>
+          </div>
+        </div>
+        <div class="dropzone-content">
+          <p class="step-label" data-i18n="stepImport">01 · 导入</p>
+          <h2 data-i18n="dropTitle">把文件放到这里</h2>
+          <p class="drop-hint" data-i18n="dropHint">拖放 ODT、FODT、RTF、HTML、Markdown 或文本文件，也可以一次选择多个文件。</p>
+          <button type="button" class="btn drop-action" id="chooseFilesButton">
+            <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M10 3v10M6 7l4-4 4 4M4 13v3h12v-3"></path></svg>
+            <span data-i18n="chooseFiles">选择文件</span>
+          </button>
+          <div class="format-row"><span data-i18n="dropFormats">ODT · FODT · RTF · HTML · MD · TXT · CSV · 单个最大 50 MB</span></div>
+          <div class="local-promise">
+            <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M6.5 9V7a3.5 3.5 0 0 1 7 0v2"></path><rect x="4.5" y="9" width="11" height="8" rx="2.5"></rect><path d="m8 13 1.3 1.3 2.8-2.8"></path></svg>
+            <span data-i18n="localPromise">文件不会离开此设备</span>
+          </div>
+        </div>
+        <input id="fileInput" type="file" multiple hidden>
+      </section>
+
+      <div class="workspace-grid">
+        <section class="panel options-panel">
+          <div class="panel-heading">
+            <div>
+              <p class="step-label" data-i18n="stepOptions">02 · 设置</p>
+              <h2 data-i18n="optionsTitle">输出方案</h2>
+              <p class="muted" data-i18n="optionsSubtitle">先选一个版式预设，再按需要微调。</p>
+            </div>
+          </div>
+
+          <div class="preset-section">
+            <label class="step-label" data-i18n="presetsLabel">快捷预设</label>
+            <div class="preset-list" id="presetList">
+              <!-- Rendered dynamically from config.presets -->
+            </div>
+          </div>
+
+          <div class="field-group">
+            <label for="optTargetFormat" data-i18n="optTargetFormat">目标格式</label>
+            <select id="optTargetFormat" class="field-select">
+              <option value="docx" selected data-i18n="formatDocx">Microsoft Word (.docx)</option>
+              <option value="txt" data-i18n="formatTxt">纯文本 (.txt)</option>
+              <option value="html" data-i18n="formatHtml">网页文档 (.html)</option>
+              <option value="md" data-i18n="formatMd">Markdown (.md)</option>
+            </select>
+          </div>
+
+          <div class="field-group">
+            <label for="optDelivery" data-i18n="optDelivery">生成方式</label>
+            <select id="optDelivery" class="field-select">
+              <option value="separate" selected data-i18n="deliverySeparate">分别输出（每个文件单独生成）</option>
+              <option value="merge" data-i18n="deliveryMerge">合并输出（拼为一个完整文档）</option>
+            </select>
+          </div>
+
+          <div class="field-group" id="zipBundleGroup">
+            <label class="checkbox-label">
+              <input type="checkbox" id="optZipBundle" checked>
+              <span data-i18n="optZipBundle">多文件打包为 ZIP 下载</span>
+            </label>
+          </div>
+
+          <div class="field-group word-only-option" id="pageSizeGroup">
+            <label for="optPageSize" data-i18n="optPageSize">页面尺寸</label>
+            <select id="optPageSize" class="field-select">
+              <option value="a4" selected>A4 (210 × 297 mm)</option>
+              <option value="letter">Letter (8.5 × 11 in)</option>
+              <option value="a5">A5 (148 × 210 mm)</option>
+              <option value="b5">B5 (176 × 250 mm)</option>
+            </select>
+          </div>
+
+          <div class="field-group word-only-option" id="marginGroup">
+            <label for="optMargin" data-i18n="optMargin">页边距</label>
+            <select id="optMargin" class="field-select">
+              <option value="normal" selected data-i18n="marginNormal">标准（25.4 mm / 1 英寸）</option>
+              <option value="narrow" data-i18n="marginNarrow">紧凑（12.7 mm / 0.5 英寸）</option>
+              <option value="wide" data-i18n="marginWide">宽边距（31.8 mm）</option>
+            </select>
+          </div>
+
+          <div class="field-group word-only-option" id="typographyGroup">
+            <label for="optTypography" data-i18n="optTypography">字体风格</label>
+            <select id="optTypography" class="field-select">
+              <option value="modern" selected data-i18n="fontModern">现代商务（Calibri / 微软雅黑）</option>
+              <option value="classic" data-i18n="fontClassic">经典公文（Times New Roman / 宋体）</option>
+              <option value="sans" data-i18n="fontSans">清新无衬线（Arial / 黑体）</option>
+            </select>
+          </div>
+
+          <div class="field-group word-only-option" id="firstLineIndentGroup">
+            <label class="checkbox-label">
+              <input type="checkbox" id="optFirstLineIndent">
+              <span data-i18n="optFirstLineIndent">首行缩进 2 字符（中文段落惯例）</span>
+            </label>
+          </div>
+
+          <div class="field-group">
+            <label for="optFilename" data-i18n="optFilename">输出文件名</label>
+            <input type="text" id="optFilename" class="field-input" value="converted" maxlength="80">
+            <p class="field-help" id="filenameHelp" data-i18n="filenameHelpSeparate">分别输出时沿用各个原文件名并修改扩展名。</p>
+          </div>
+        </section>
+
+        <section class="panel queue-panel">
+          <div class="panel-heading">
+            <div>
+              <p class="step-label" data-i18n="stepQueue">03 · 生成</p>
+              <h2 data-i18n="queueTitle">文件队列</h2>
+            </div>
+            <div class="queue-header-actions">
+              <button type="button" class="btn btn-subtle" id="reverseQueueButton" data-i18n="btnReverse">倒序</button>
+              <button type="button" class="btn btn-subtle" id="clearQueueButton" data-i18n="btnClear">清空</button>
+            </div>
+          </div>
+
+          <div class="queue-summary-bar">
+            <span id="queueCountLabel">0 个文件</span>
+            <span id="queueTotalSizeLabel">共 0 B</span>
+          </div>
+
+          <div class="queue-list" id="queueList">
+            <!-- Dynamically populated or empty queue state -->
+          </div>
+        </section>
+      </div>
+
+      <section class="export-bar" id="exportBar">
+        <div class="export-info">
+          <strong id="actionStatus" data-i18n="actionEmpty">先添加文件，再开始转换</strong>
+          <span id="actionHint" data-i18n="emptyState">导入后可以查看识别类型、调整顺序和预览。</span>
+          <div class="progress-wrap" id="progressWrap">
+            <div class="progress-fill" id="progressFill"></div>
+          </div>
+        </div>
+        <button type="button" class="btn btn-convert" id="convertButton" disabled>
+          <span data-i18n="btnConvert">开始转换</span>
+        </button>
+      </section>
+
+      <section class="trust-grid" data-i18n-aria-label="guaranteesAria" aria-label="产品保障">
+        <div class="trust-card">
+          <div class="trust-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+          </div>
+          <h3 data-i18n="trustLocalTitle">100% 本地处理</h3>
+          <p data-i18n="trustLocalText">所有转换在浏览器内完成，文件绝不上传。</p>
+        </div>
+        <div class="trust-card">
+          <div class="trust-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+          </div>
+          <h3 data-i18n="trustFidelityTitle">高保真 ODT 转 Word</h3>
+          <p data-i18n="trustFidelityText">完美保留段落、标题、表格、列表与内嵌图片。</p>
+        </div>
+        <div class="trust-card">
+          <div class="trust-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24"><line x1="1" y1="1" x2="23" y2="23"></line><path d="M16.72 11.06A10.94 10.94 0 0 1 19 12.55"></path><path d="M5 12.55a10.94 10.94 0 0 1 5.17-2.39"></path><path d="M10.71 5.05A16 16 0 0 1 22.56 9"></path><path d="M1.42 9a15.91 15.91 0 0 1 4.7-2.88"></path><path d="M8.53 16.11a6 6 0 0 1 6.95 0"></path><line x1="12" y1="20" x2="12.01" y2="20"></line></svg>
+          </div>
+          <h3 data-i18n="trustOfflineTitle">完全离线可用</h3>
+          <p data-i18n="trustOfflineText">内置纯 JS 依赖，无网络亦可运行。</p>
+        </div>
+      </section>
+
+      <section class="tips-section">
+        <h3 data-i18n="tipsTitle">格式转换与排版支持说明</h3>
+        <ul class="tips-list">
+          <li data-i18n="tip1"><strong>100% 隐私安全</strong>：转换全部在浏览器内存中运算完成，没有后端服务器，文件<strong>绝不上云</strong>。</li>
+          <li data-i18n="tip2"><strong>ODT 格式高保真</strong>：深度解析 LibreOffice / OpenOffice ODT XML 结构，完整转换标题层级、粗体斜体、文字颜色、背景高亮、列表、表格与图片。</li>
+          <li data-i18n="tip3"><strong>FODT / RTF / HTML / MD</strong>：全面支持各种特殊文档结构，一键重排为规范的 Microsoft Word 格式。</li>
+          <li data-i18n="tip4"><strong>合并功能</strong>：开启“合并为一个 Word”后，可将多份零散材料依序组合，自动插入分页符与统一章节样式。</li>
+          <li data-i18n="tip5"><strong>纯文本导出</strong>：选择 .txt 可快速提纯文本，自动清理冗余格式，并保留清晰的表格与清单结构。</li>
+          <li data-i18n="tip6"><strong>完全免安装</strong>：随时在手机或电脑浏览器打开即用，支持离线与局域网静态部署。</li>
+        </ul>
+      </section>
+    </main>
+
+    <footer class="footer">
+      <span data-i18n="footerNote">开源 · 纯前端 · 零依赖云端</span>
+      <a href="https://github.com/ngiken/KenEasy-word.git" target="_blank" rel="noopener noreferrer" data-i18n="footerGithub">GitHub 仓库</a>
+    </footer>
+  </div>
+
+  <div class="toast-container" id="toastContainer" aria-live="polite" aria-atomic="true"></div>
+
+  <!-- Offline Vendored Libraries -->
+  <script src="vendor/jszip.min.js"></script>
+  <script src="vendor/Sortable.min.js"></script>
+
+  <!-- Application Layered Modules -->
+  <script src="config.js?v=1.0.0"></script>
+  <script src="i18n.js?v=1.0.0"></script>
+  <script src="doc-engine.js?v=1.0.0"></script>
+  <script src="app.js?v=1.0.0"></script>
+</body>
+</html>
