@@ -414,6 +414,7 @@
         fontSizePt: 12,
         align: "left",
         color: null,
+        skip: false,
       };
 
       var colorTable = [];
@@ -447,16 +448,44 @@
           var nextChar = text[i];
 
           if (nextChar === "{" || nextChar === "}" || nextChar === "\\") {
-            currentParagraph.runs.push(Object.assign({ text: nextChar }, curState));
+            if (!curState.skip) {
+              currentParagraph.runs.push(Object.assign({ text: nextChar }, curState));
+            }
+            i++;
+          } else if (nextChar === "*") {
+            // Ignorable destination group {\*...}
+            curState.skip = true;
             i++;
           } else if (nextChar === "'") {
-            // Hex character \'xx
-            i++;
-            var hex = text.substr(i, 2);
-            i += 2;
-            var code = parseInt(hex, 16);
-            if (!isNaN(code)) {
-              currentParagraph.runs.push(Object.assign({ text: String.fromCharCode(code) }, curState));
+            // Hex character \'xx - collect consecutive hex bytes
+            var hexBytes = [];
+            while (i < len - 2 && text[i] === "'" && /[0-9a-fA-F]{2}/.test(text.substr(i + 1, 2))) {
+              i++; // skip '
+              hexBytes.push(parseInt(text.substr(i, 2), 16));
+              i += 2;
+              // Check if next is another \'xx
+              if (i < len - 2 && text[i] === "\\" && text[i + 1] === "'") {
+                i++; // skip \
+              } else {
+                break;
+              }
+            }
+            if (hexBytes.length > 0 && !curState.skip) {
+              var decodedStr = "";
+              try {
+                decodedStr = new TextDecoder("utf-8", { fatal: true }).decode(new Uint8Array(hexBytes));
+              } catch (e1) {
+                try {
+                  decodedStr = new TextDecoder("gb18030").decode(new Uint8Array(hexBytes));
+                } catch (e2) {
+                  decodedStr = hexBytes
+                    .map(function (b) {
+                      return String.fromCharCode(b);
+                    })
+                    .join("");
+                }
+              }
+              currentParagraph.runs.push(Object.assign({ text: decodedStr }, curState));
             }
           } else {
             // Read control word
@@ -480,14 +509,45 @@
 
             var num = param !== "" ? parseInt(param, 10) : null;
 
+            var skipDestinations = [
+              "fonttbl", "colortbl", "stylesheet", "info", "docprops",
+              "header", "headerl", "headerr", "headerf",
+              "footer", "footerl", "footerr", "footerf",
+              "pict", "generator", "author", "operator", "creatim", "revtim", "version",
+              "title", "subject", "keywords", "comment", "doccomm", "fontemb", "fontfile"
+            ];
+            if (skipDestinations.indexOf(word) !== -1) {
+              curState.skip = true;
+            }
+
             if (word === "par") {
               // Flush paragraph
-              ast.elements.push(currentParagraph);
-              currentParagraph = {
-                type: "paragraph",
-                runs: [],
-                align: curState.align || "left",
-              };
+              if (!curState.skip && currentParagraph.runs.length > 0) {
+                ast.elements.push(currentParagraph);
+                currentParagraph = {
+                  type: "paragraph",
+                  runs: [],
+                  align: curState.align || "left",
+                };
+              }
+            } else if (word === "line") {
+              if (!curState.skip) {
+                currentParagraph.runs.push(Object.assign({ text: "\n", breakLine: true }, curState));
+              }
+            } else if (word === "bullet") {
+              if (!curState.skip) currentParagraph.runs.push(Object.assign({ text: "• " }, curState));
+            } else if (word === "emdash") {
+              if (!curState.skip) currentParagraph.runs.push(Object.assign({ text: "—" }, curState));
+            } else if (word === "endash") {
+              if (!curState.skip) currentParagraph.runs.push(Object.assign({ text: "–" }, curState));
+            } else if (word === "ldblquote") {
+              if (!curState.skip) currentParagraph.runs.push(Object.assign({ text: "“" }, curState));
+            } else if (word === "rdblquote") {
+              if (!curState.skip) currentParagraph.runs.push(Object.assign({ text: "”" }, curState));
+            } else if (word === "lquote") {
+              if (!curState.skip) currentParagraph.runs.push(Object.assign({ text: "‘" }, curState));
+            } else if (word === "rquote") {
+              if (!curState.skip) currentParagraph.runs.push(Object.assign({ text: "’" }, curState));
             } else if (word === "b") {
               curState.bold = num === 0 ? false : true;
             } else if (word === "i") {
@@ -513,10 +573,10 @@
               curState.align = "justify";
               currentParagraph.align = "justify";
             } else if (word === "tab") {
-              currentParagraph.runs.push(Object.assign({ text: "\t" }, curState));
+              if (!curState.skip) currentParagraph.runs.push(Object.assign({ text: "\t" }, curState));
             } else if (word === "u") {
               // Unicode codepoint \uN?
-              if (num !== null) {
+              if (num !== null && !curState.skip) {
                 var uChar = String.fromCharCode(num < 0 ? num + 65536 : num);
                 currentParagraph.runs.push(Object.assign({ text: uChar }, curState));
                 // Often followed by replacement char like ?, skip if next is non-backslash
@@ -540,7 +600,7 @@
             runText += text[i];
             i++;
           }
-          if (runText) {
+          if (runText && !curState.skip) {
             currentParagraph.runs.push(Object.assign({ text: runText }, curState));
           }
         }
@@ -1466,12 +1526,30 @@
         tblXml += "        </w:tblBorders>\n";
         tblXml += "      </w:tblPr>\n";
 
+        var maxCols = 1;
+        for (var rIdx = 0; rIdx < el.rows.length; rIdx++) {
+          var colCount = 0;
+          for (var cIdx = 0; cIdx < el.rows[rIdx].cells.length; cIdx++) {
+            colCount += (el.rows[rIdx].cells[cIdx].colSpan || 1);
+          }
+          if (colCount > maxCols) maxCols = colCount;
+        }
+
+        tblXml += "      <w:tblGrid>\n";
+        var colW = Math.max(720, Math.floor(9000 / maxCols));
+        for (var g = 0; g < maxCols; g++) {
+          tblXml += '        <w:gridCol w:w="' + colW + '"/>\n';
+        }
+        tblXml += "      </w:tblGrid>\n";
+
         for (var r = 0; r < el.rows.length; r++) {
           tblXml += "      <w:tr>\n";
           var row = el.rows[r];
           for (var c = 0; c < row.cells.length; c++) {
             var cell = row.cells[c];
+            var cellW = colW * (cell.colSpan || 1);
             tblXml += "        <w:tc>\n          <w:tcPr>\n";
+            tblXml += '            <w:tcW w:w="' + cellW + '" w:type="dxa"/>\n';
             if (cell.colSpan > 1) {
               tblXml += '            <w:gridSpan w:val="' + cell.colSpan + '"/>\n';
             }

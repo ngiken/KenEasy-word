@@ -3,7 +3,7 @@
   "use strict";
 
   var config = {
-    version: "1.0.0",
+    version: "0.1.0",
     appName: "KenEasy Word Converter",
     storageKeys: {
       language: "keneasy-word-lang",
