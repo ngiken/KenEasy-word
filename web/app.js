@@ -99,6 +99,12 @@
   }
 
   function toggleTheme() {
+    if (els.themeToggle) {
+      els.themeToggle.classList.add("theme-spin");
+      setTimeout(function () {
+        if (els.themeToggle) els.themeToggle.classList.remove("theme-spin");
+      }, 400);
+    }
     applyTheme(currentTheme === "dark" ? "light" : "dark", true);
   }
 
@@ -269,6 +275,7 @@
   }
 
   function removeItem(id) {
+    if (isBusy) return;
     var index = -1;
     for (var i = 0; i < items.length; i++) {
       if (items[i].id === id) {
@@ -276,21 +283,53 @@
         break;
       }
     }
-    if (index !== -1) {
-      var name = items[index].name;
-      items.splice(index, 1);
-      renderQueue();
-      updateWorkflowState();
-      showToast(t("toastRemoved", { name: name }));
+    if (index === -1) return;
+    var name = items[index].name;
+    var row = els.queueList ? els.queueList.querySelector('.queue-item[data-id="' + id + '"]') : null;
+
+    function finish() {
+      var liveIndex = -1;
+      for (var j = 0; j < items.length; j++) {
+        if (items[j].id === id) {
+          liveIndex = j;
+          break;
+        }
+      }
+      if (liveIndex !== -1) {
+        items.splice(liveIndex, 1);
+        renderQueue();
+        updateWorkflowState();
+        showToast(t("toastRemoved", { name: name }));
+      }
+    }
+
+    if (row) {
+      row.classList.add("removing");
+      setTimeout(finish, 200);
+    } else {
+      finish();
     }
   }
 
   function clearQueue() {
-    if (items.length === 0) return;
-    items = [];
-    renderQueue();
-    updateWorkflowState();
-    showToast(t("toastCleared"));
+    if (items.length === 0 || isBusy) return;
+    var rows = els.queueList ? els.queueList.querySelectorAll(".queue-item") : [];
+    if (rows.length > 0) {
+      Array.prototype.forEach.call(rows, function (row) {
+        row.classList.add("removing");
+      });
+      setTimeout(function () {
+        items = [];
+        renderQueue();
+        updateWorkflowState();
+        showToast(t("toastCleared"));
+      }, 200);
+    } else {
+      items = [];
+      renderQueue();
+      updateWorkflowState();
+      showToast(t("toastCleared"));
+    }
   }
 
   function reverseQueue() {
@@ -347,8 +386,9 @@
     for (var i = 0; i < items.length; i++) {
       var it = items[i];
       var div = document.createElement("div");
-      div.className = "queue-item";
+      div.className = "queue-item item-animate-in";
       div.setAttribute("data-id", it.id);
+      div.style.setProperty("--item-delay", (i * 35) + "ms");
 
       var badgeClass = getKindBadgeClass(it.kind);
       var badgeText = it.kind.toUpperCase();
@@ -456,10 +496,34 @@
     });
   }
 
+  function setQueueItemStatus(id, status) {
+    var list = els.queueList;
+    if (!list) return;
+    var row = list.querySelector('.queue-item[data-id="' + id + '"]');
+    if (!row) return;
+    row.classList.remove("is-processing", "is-done");
+    if (status === "processing") {
+      row.classList.add("is-processing");
+      try {
+        row.scrollIntoView({ behavior: "smooth", block: "nearest" });
+      } catch (e) {}
+    } else if (status === "done") {
+      row.classList.add("is-done");
+    }
+  }
+
   function updateWorkflowState() {
     var step1 = document.querySelector('[data-workflow-step="1"]');
     var step2 = document.querySelector('[data-workflow-step="2"]');
     var step3 = document.querySelector('[data-workflow-step="3"]');
+
+    if (els.dropzone) {
+      if (items.length > 0) {
+        els.dropzone.classList.add("has-files");
+      } else {
+        els.dropzone.classList.remove("has-files");
+      }
+    }
 
     if (items.length === 0) {
       if (step1) step1.setAttribute("aria-current", "step");
@@ -517,6 +581,7 @@
     isBusy = true;
     if (els.convertButton) {
       els.convertButton.disabled = true;
+      els.convertButton.classList.add("is-busy");
       els.convertButton.innerHTML = "<span>" + t("btnWorking") + "</span>";
     }
     updateWorkflowState();
@@ -528,10 +593,12 @@
         var asts = [];
         for (var i = 0; i < items.length; i++) {
           var it = items[i];
+          setQueueItemStatus(it.id, "processing");
           var pct = Math.round(10 + (i / items.length) * 50);
           setProgress(pct, t("statusParsing", { name: it.name }));
           var ast = await engine.parseFile(it.file);
           asts.push(ast);
+          setQueueItemStatus(it.id, "done");
         }
 
         setProgress(70, t("statusGenerating", { ext: format.toUpperCase() }));
@@ -546,6 +613,7 @@
         var convertedList = [];
         for (var j = 0; j < items.length; j++) {
           var item = items[j];
+          setQueueItemStatus(item.id, "processing");
           var stepPct = Math.round(10 + (j / items.length) * 60);
           setProgress(stepPct, t("statusParsing", { name: item.name }));
 
@@ -558,6 +626,7 @@
             name: singleResult.filename,
             blob: singleResult.blob,
           });
+          setQueueItemStatus(item.id, "done");
         }
 
         if (zipBundle && convertedList.length > 1) {
@@ -579,6 +648,14 @@
           showToast(t("toastConverted"));
         }
       }
+
+      if (els.convertButton) {
+        els.convertButton.classList.remove("is-busy");
+        els.convertButton.classList.add("is-success");
+        setTimeout(function () {
+          if (els.convertButton) els.convertButton.classList.remove("is-success");
+        }, 1600);
+      }
     } catch (err) {
       console.error("Conversion error:", err);
       showToast(t("toastError", { msg: err.message || "Unknown error" }), true);
@@ -587,6 +664,7 @@
       isBusy = false;
       if (els.convertButton) {
         els.convertButton.disabled = false;
+        els.convertButton.classList.remove("is-busy");
         els.convertButton.innerHTML = "<span>" + t("btnConvert") + "</span>";
       }
       setTimeout(function () {
