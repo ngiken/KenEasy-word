@@ -23,7 +23,7 @@
 <br/>
 
 <img alt="Use online" src="https://img.shields.io/badge/%E5%9C%A8%E7%BA%BF%E4%BD%BF%E7%94%A8-ngiken.github.io-fb7299?style=for-the-badge">
-<img alt="Version" src="https://img.shields.io/badge/version-0.1.0-0071e3?style=for-the-badge">
+<img alt="Version" src="https://img.shields.io/badge/version-0.1.1-0071e3?style=for-the-badge">
 <img alt="Privacy" src="https://img.shields.io/badge/privacy-local%20only-00aeec?style=for-the-badge">
 <img alt="Tests" src="https://img.shields.io/badge/e2e-32%2F32-27c499?style=for-the-badge">
 <img alt="License" src="https://img.shields.io/badge/license-MIT-9aa4b2?style=for-the-badge">
@@ -151,6 +151,15 @@ python -m http.server 5173 --directory web
 ```
 
 在浏览器打开 `http://localhost:5173/` 即可。
+
+---
+
+## 更新记录
+
+### v0.1.1
+
+- 版本号与资源缓存参数统一到 `0.1.1`，避免浏览器继续复用旧版 CSS/JS 缓存
+- 页脚新增 `Updated 2026-11-12` 更新时间标记
 
 ---
 
